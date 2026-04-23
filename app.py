@@ -267,7 +267,7 @@ This is an automated message from the Accident Detection System.
 # Play alarm sound
 def play_alarm():
     try:
-        audio_file = Path("working\emergency-alarm-69780.mp3")
+        audio_file = Path("working/emergency-alarm-69780.mp3")
 
         if audio_file.exists():
             audio_bytes = audio_file.read_bytes()
