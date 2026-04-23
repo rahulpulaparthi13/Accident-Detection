@@ -266,7 +266,7 @@ This is an automated message from the Accident Detection System.
 
 # Play alarm sound
 def play_alarm():
-    audio_file = Path(r"C:\Users\rahul\Downloads\working_dir\kaggle\working\emergency-alarm-69780.mp3")
+    audio_file = Path(r"working\emergency-alarm-69780.mp3")
     if audio_file.exists():
         audio_bytes = audio_file.read_bytes()
         audio_base64 = base64.b64encode(audio_bytes).decode()
@@ -508,9 +508,9 @@ def main():
     
     # Model paths
     model_paths = {
-        'VGG16': Path(r"C:\Users\rahul\Downloads\working_dir\kaggle\working\VGG16_best.pth"),
-        'ResNet50': Path(r"C:\Users\rahul\Downloads\working_dir\kaggle\working\ResNet50_best.pth"),
-        'DenseNet121': Path(r"C:\Users\rahul\Downloads\working_dir\kaggle\working\DenseNet121_best.pth")
+        'VGG16': Path("working/VGG16_best.pth"),
+        'ResNet50': Path("working/ResNet50_best.pth"),
+        'DenseNet121': Path("working/DenseNet121_best.pth")
     }
     
     # Load models
