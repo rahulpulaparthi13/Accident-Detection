@@ -598,56 +598,23 @@ def main():
                 cap.release()
                 st.success(f"✅ Video analysis complete! Analyzed {analyzed_count} frames.")
     
-    # LIVE WEBCAM
+    # LIVE WEBCAM (FIXED)
     elif input_mode == "📹 Live Webcam":
-        st.subheader("Live Webcam Monitoring")
-        st.warning("⚠️ This will access your webcam. Press 'Stop' to end monitoring.")
-        
-        run_webcam = st.checkbox("🔴 Start Webcam")
-        
-        if run_webcam:
-            frame_placeholder = st.empty()
-            result_placeholder = st.empty()
-            
-            cap = cv2.VideoCapture(0)
-            
-            if not cap.isOpened():
-                st.error("❌ Cannot access webcam!")
-                return
-            
-            frame_count = 0
-            analyze_interval = 30  # Analyze every 30 frames (about 1 sec at 30fps)
-            
-            while run_webcam:
-                ret, frame = cap.read()
-                if not ret:
-                    st.error("Failed to grab frame")
-                    break
-                
-                frame_count += 1
-                frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                
-                # Display frame
-                frame_placeholder.image(frame_rgb, channels="RGB", use_column_width=True)
-                
-                # Analyze periodically
-                if frame_count % analyze_interval == 0:
-                    with result_placeholder.container():
-                        st.write(f"**Analysis #{frame_count // analyze_interval}**")
-                        severity, confidence = process_image(frame_rgb, models_dict, emergency_contacts)
-                        
-                        # If severe accident detected, trigger alert
-                        if severity in ['Severe Accident', 'Totalled Vehicle']:
-                            st.error("🚨 CRITICAL: Severe accident detected in live feed!")
-                
-                time.sleep(0.033)  # ~30 fps
-                
-                # Check if checkbox is still enabled
-                if not st.session_state.get('run_webcam', True):
-                    break
-            
-            cap.release()
-            st.info("Webcam stopped.")
+        st.subheader("Live Webcam Monitoring (Browser Camera)")
+        st.warning("📸 Click below to capture a frame from your webcam")
+    
+        camera_image = st.camera_input("Take a photo")
+    
+        if camera_image is not None:
+            image = Image.open(camera_image).convert('RGB')
+    
+            st.image(image, caption="Captured Frame", use_column_width=True)
+    
+            with st.spinner("Analyzing frame..."):
+                severity, confidence = process_image(image, models_dict, emergency_contacts)
+    
+            if severity in ['Severe Accident', 'Totalled Vehicle']:
+                st.error("🚨 CRITICAL: Severe accident detected!")
 
 if __name__ == "__main__":
     main()
