@@ -361,18 +361,36 @@ def trigger_emergency_response(severity, confidence, emergency_contacts):
 
 # Process single image
 def process_image(image, models_dict, emergency_contacts):
-    # Convert to PIL and transform
+    # 🔥 Handle all possible input types safely
+    if image is None:
+        raise ValueError("Invalid image/frame received")
+    # Case 1: OpenCV frame (numpy array)
     if isinstance(image, np.ndarray):
+        # Ensure uint8
+        if image.dtype != np.uint8:
+            image = image.astype(np.uint8)
+
+        # Ensure 3 channels
+        if len(image.shape) == 2:
+            image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
+        elif image.shape[2] == 4:
+            image = cv2.cvtColor(image, cv2.COLOR_RGBA2RGB)
+
         image = Image.fromarray(image)
-    
-    # 🔥 Force clean RGB (important fix)
-    if not isinstance(image, Image.Image):
-        image = Image.open(image)
-    
-    image = image.convert("RGB")
-    image = np.array(image).astype(np.uint8)
+
+    # Case 2: PIL Image
+    elif isinstance(image, Image.Image):
+        image = image.convert("RGB")
+
+    # Case 3: fallback (file-like)
+    else:
+        image = Image.open(image).convert("RGB")
+
+    # Final safety conversion
+    image = np.array(image, dtype=np.uint8)
     image = Image.fromarray(image)
-    
+
+    # ✅ Transform
     image_tensor = transform(image).unsqueeze(0).to(device)
     
     # Get prediction
