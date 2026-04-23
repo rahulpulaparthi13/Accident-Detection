@@ -365,6 +365,14 @@ def process_image(image, models_dict, emergency_contacts):
     if isinstance(image, np.ndarray):
         image = Image.fromarray(image)
     
+    # 🔥 Force clean RGB (important fix)
+    if not isinstance(image, Image.Image):
+        image = Image.open(image)
+    
+    image = image.convert("RGB")
+    image = np.array(image).astype(np.uint8)
+    image = Image.fromarray(image)
+    
     image_tensor = transform(image).unsqueeze(0).to(device)
     
     # Get prediction
