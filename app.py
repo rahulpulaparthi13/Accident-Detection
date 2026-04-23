@@ -266,13 +266,34 @@ This is an automated message from the Accident Detection System.
 
 # Play alarm sound
 def play_alarm():
-    audio_file = Path(r"working\emergency-alarm-69780.mp3")
-    if audio_file.exists():
-        audio_bytes = audio_file.read_bytes()
-        audio_base64 = base64.b64encode(audio_bytes).decode()
-        audio_tag = f'<audio autoplay><source src="data:audio/mp3;base64,{audio_base64}" type="audio/mp3"></audio>'
-        st.markdown(audio_tag, unsafe_allow_html=True)
+    try:
+        audio_file = Path("working\emergency-alarm-69780.mp3")
 
+        if audio_file.exists():
+            audio_bytes = audio_file.read_bytes()
+            audio_base64 = base64.b64encode(audio_bytes).decode()
+
+            audio_html = f"""
+            <audio id="alarmAudio" autoplay>
+                <source src="data:audio/mp3;base64,{audio_base64}" type="audio/mp3">
+            </audio>
+            <script>
+                var audio = document.getElementById("alarmAudio");
+                if (audio) {{
+                    audio.play().catch(function(error) {{
+                        console.log("Autoplay blocked:", error);
+                    }});
+                }}
+            </script>
+            """
+
+            st.markdown(audio_html, unsafe_allow_html=True)
+        else:
+            st.warning("⚠️ Alarm file not found!")
+
+    except Exception as e:
+        st.error(f"Alarm error: {e}")
+        
 # Trigger emergency response
 def trigger_emergency_response(severity, confidence, emergency_contacts):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
